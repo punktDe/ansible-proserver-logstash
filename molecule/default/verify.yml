@@ -2,7 +2,42 @@
 - name: Verify
   hosts: all
   gather_facts: false
+  vars:
+    pipeline:
+      input:
+        beats:
+          port: 5044
+          host: "0.0.0.0"
+      filter:
+        grok:
+          match:
+            message: "%{COMBINEDAPACHELOG}"
+      output:
+        elasticsearch:
+          hosts:
+            - "localhost:9200"
+          index: "logstash-%{+YYYY.MM.dd}"
   tasks:
-    - name: Example assertion
+    - name: Run logstash_pipeline filter
+      ansible.builtin.set_fact:
+        pipeline_config: "{{ pipeline | logstash_pipeline }}"
+
+    - name: Filter output contains input section
       ansible.builtin.assert:
-        that: true
+        that: "'input {' in pipeline_config and 'beats {' in pipeline_config"
+        fail_msg: "Expected input/beats block in pipeline config"
+
+    - name: Filter output contains filter section
+      ansible.builtin.assert:
+        that: "'filter {' in pipeline_config and 'grok {' in pipeline_config and '%{COMBINEDAPACHELOG}' in pipeline_config"
+        fail_msg: "Expected filter/grok block in pipeline config"
+
+    - name: Filter output contains output section
+      ansible.builtin.assert:
+        that: "'output {' in pipeline_config and 'elasticsearch {' in pipeline_config and 'localhost:9200' in pipeline_config"
+        fail_msg: "Expected output/elasticsearch block in pipeline config"
+
+    - name: Filter uses Logstash => syntax
+      ansible.builtin.assert:
+        that: "'=> 5044' in pipeline_config and '=>' in pipeline_config"
+        fail_msg: "Expected Logstash => key-value syntax"

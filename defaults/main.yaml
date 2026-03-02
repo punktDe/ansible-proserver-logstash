@@ -1,5 +1,6 @@
 ---
 logstash:
+  pipelines: {}
   logstash.yml: {}
   version: 8
   repository:

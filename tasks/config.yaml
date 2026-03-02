@@ -47,3 +47,12 @@
     state: directory
     group: logstash
     mode: g+rwx
+
+- name: Template pipeline configuration files
+  ansible.builtin.copy:
+    content: "{{ item.value | logstash_pipeline }}"
+    owner: root
+    group: logstash
+    mode: "0644"
+    dest: "{{ logstash.prefix.config }}/conf.d/{{ item.key }}.conf"
+  loop: "{{ logstash.pipelines | dict2items }}"
