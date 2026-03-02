@@ -1,0 +1,17 @@
+---
+logstash:
+  logstash.yml: {}
+  version: 8
+  repository:
+    apt:
+      key_url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      repository: https://artifacts.elastic.co/packages/{{ vars.logstash.version }}.x/apt
+  prefix:
+    config: >-
+      {%- if ansible_facts['system'] == 'Linux' -%}
+        /etc/logstash
+      {%- else -%}
+        /usr/local/etc/logstash
+      {%- endif -%}
+  log4j2.properties: {}
+  jvm.options: {}

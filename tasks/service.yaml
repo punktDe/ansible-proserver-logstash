@@ -1,0 +1,6 @@
+---
+- name: Start Logstash
+  ansible.builtin.service:
+    name: logstash
+    state: started
+  register: logstash_service_start_result

@@ -1,0 +1,10 @@
+---
+- name: Install Logstash
+  when: ansible_facts['os_family'] == 'Debian'
+  ansible.builtin.include_tasks: install.yaml
+
+- name: Configure Logstash
+  ansible.builtin.include_tasks: config.yaml
+
+- name: Start the Logstash service
+  ansible.builtin.include_tasks: service.yaml

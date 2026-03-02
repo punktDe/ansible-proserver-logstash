@@ -1,0 +1,9 @@
+---
+galaxy_info:
+  author: "punkt.de"
+  license: "MIT"
+  role_name: logstash
+  description: "Logstash role for Proserver"
+  namespace: "punktde"
+  min_ansible_version: "2.19"
+  platforms: []

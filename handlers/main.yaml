@@ -1,0 +1,7 @@
+---
+- name: Restart Logstash
+  throttle: 1
+  when: logstash_service_start_result is defined and not logstash_service_start_result.changed
+  ansible.builtin.service:
+    name: logstash
+    state: restarted

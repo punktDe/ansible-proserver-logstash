@@ -1,0 +1,49 @@
+---
+- name: Enable Logstash service
+  ansible.builtin.service:
+    name: logstash
+    enabled: yes
+
+- name: Template Logstash configuration
+  ansible.builtin.copy:
+    content: "{{ logstash['logstash.yml'] | to_nice_yaml(indent=2) }}"
+    dest: "{{ logstash.prefix.config }}/logstash.yml"
+    owner: root
+    group: logstash
+    mode: "0664"
+  notify: Restart Logstash
+
+- name: Configure Logstash (log4j2.properties)
+  register: log4j2_configuration
+  ansible.builtin.lineinfile:
+    path: "{{ config_filepath }}"
+    regexp: "^{{ item.key | regex_escape }}[\\s\\t]*="
+    line: "{{ item.key }} = {{ item.value }}"
+    state: "{{ 'present' if item.value is not none else 'absent' }}"
+  loop_control:
+    label: "{{ config_filepath }} {{ item.key }}={{ item.value }}"
+  loop: "{{ logstash['log4j2.properties'] | dict2items }}"
+  vars:
+    config_filepath: "{{ logstash.prefix.config }}/log4j2.properties"
+  notify: Restart Logstash
+
+- name: Configure Logstash (jvm.options)
+  register: jvm_configuration
+  ansible.builtin.lineinfile:
+    path: "{{ config_filepath }}"
+    regexp: "^{{ item.key | regex_escape }}"
+    line: "{{ item.key }}{{ item.value }}"
+    state: "{{ 'present' if item.value is not none else 'absent' }}"
+  loop_control:
+    label: "{{ config_filepath }} {{ item.key }}{{ item.value }}"
+  loop: "{{ logstash['jvm.options'] | dict2items }}"
+  vars:
+    config_filepath: "{{ logstash.prefix.config }}/jvm.options"
+  notify: Restart Logstash
+
+- name: Allow Logstash to update its own configuration
+  ansible.builtin.file:
+    path: "{{ logstash.prefix.config }}"
+    state: directory
+    group: logstash
+    mode: g+rwx

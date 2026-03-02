@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  environment:
+    GITHUB_ACTIONS: "maybe"
+    ANSIBLE_HASH_BEHAVIOUR: merge
+  tasks:
+    - name: "Include ansible-proserver-logstash"
+      ansible.builtin.include_role:
+        name: "ansible-proserver-logstash"

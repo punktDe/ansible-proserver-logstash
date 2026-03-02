@@ -1,0 +1,32 @@
+---
+- name: Install python3-debian package with apt
+  ansible.builtin.apt:
+    name: python3-debian
+    update_cache: yes
+
+- name: Remove the legacy apt repository
+  ansible.builtin.file:
+    dest: /etc/apt/sources.list.d/elastic.list
+    state: absent
+
+- name: Add the Elasticsearch apt repository
+  register: logstash_repository_added
+  ansible.builtin.deb822_repository:
+    name: elastic
+    uris: "{{ logstash.repository.apt.repository }}"
+    signed_by: "{{ logstash.repository.apt.key_url }}"
+    types: [deb]
+    components: [main]
+    suites: [stable]
+    state: present
+    enabled: yes
+
+- name: Update apt cache
+  when: logstash_repository_added.changed
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install Logstash
+  notify: Restart Logstash
+  ansible.builtin.apt:
+    name: logstash

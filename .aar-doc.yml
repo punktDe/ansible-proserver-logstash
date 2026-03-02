@@ -1,0 +1,105 @@
+---
+output_file: README.md
+output_mode: replace
+output_template: |
+  <!-- BEGIN_ANSIBLE_DOCS -->
+  <!--
+  Do not edit README.md directly!
+
+  This file is generated automatically by aar-doc and will be overwritten.
+
+  Please edit meta/argument_specs.yml instead.
+  -->
+  # {{ role }}
+
+  {{ metadata.galaxy_info.description }}
+
+  ## Supported Operating Systems
+
+  - Debian 12, 13
+  - Ubuntu 24.04, 22.04
+  - FreeBSD [Proserver](https://infrastructure.punkt.de/de/produkte/proserver.html)
+
+  ## Role Arguments
+
+  {% for entrypoint in argument_specs.keys() %}
+
+  {% if "description" in argument_specs[entrypoint] %}
+  {%- if argument_specs[entrypoint].description is string -%}
+  {{ argument_specs[entrypoint].description }}
+  {% else %}
+  {%- for line in argument_specs[entrypoint].description -%}
+  {{ line }}
+
+  {% endfor -%}
+  {% endif -%}
+  {% endif -%}
+
+  {% if entrypoint_options[entrypoint] | length > 1 -%}
+  {% for path, options in entrypoint_options[entrypoint][1:] -%}
+  #### Options for `{{ path | reject('eq', 'main') | join(".") }}`
+
+  |Option|Description|Type|Required|Default|
+  |---|---|---|---|---|
+  {%- for name, details in options.items() %}
+  | `{{ name }}` | {{ details.display_description }} | {{ details.display_type }} | {{ details.display_required }} | {{ details.display_default }} |
+  {%- endfor %}
+
+  {% endfor -%}
+
+  {% endif -%}
+
+  {% if entrypoint in entrypoint_choices -%}
+  {% for path, choices in entrypoint_choices[entrypoint] -%}
+  #### Choices for {{ path | join(" > ") }}
+
+  |Choice|
+  |---|
+  {%- for item in choices %}
+  | {{ item }} |
+  {%- endfor %}
+
+  {% endfor -%}
+  {% endif -%}
+  {% else -%}
+
+  This entrypoint has no options.
+
+  {% endfor -%}
+
+  ## Dependencies
+
+  {%- if ("dependencies" in metadata) and (metadata.dependencies | length > 0) %}
+  {%- for dependency in metadata.dependencies %}
+  {%- if dependency.src %}
+  - [{{ dependency.role }}]({{ dependency.src }})
+  {%- else %}
+  - {{ dependency.role }}
+  {%- endif %}
+    {%- if dependency.when %}
+    - **Condition**: `{{ dependency.when }}`
+    {%- endif %}
+  {%- endfor %}
+  {%- else %}
+  None.
+  {%- endif %}
+
+  ## Installation
+  Add this role to the requirements.yml of your playbook as follows:
+  ```yaml
+  roles:
+    - name: {{ role }}
+      src: https://github.com/punktDe/ansible-proserver-logstash
+  ```
+
+  Afterwards, install the role by running `ansible-galaxy install -r requirements.yml`
+
+  ## Example Playbook
+
+  ```yaml
+  - hosts: all
+    roles:
+      - name: logstash
+  ```
+
+  <!-- END_ANSIBLE_DOCS -->
