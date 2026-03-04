@@ -16,7 +16,7 @@ def _format_value(value: object) -> str:
         return f'"{escaped}"'
     if isinstance(value, Sequence) and not isinstance(value, str):
         parts = [_format_value(item) for item in value]
-        return "[ " + " ".join(parts) + " ]"
+        return "[ " + ", ".join(parts) + " ]"
     if isinstance(value, Mapping):
         pairs = []
         for k, v in value.items():
