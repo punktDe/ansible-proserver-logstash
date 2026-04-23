@@ -16,6 +16,9 @@ platforms:
   - name: ubuntu-2404
     image: geerlingguy/docker-ubuntu2404-ansible
     <<: *default_platform
+  - name: ubuntu-2604
+    image: geerlingguy/docker-ubuntu2604-ansible
+    <<: *default_platform
   - name: debian-12
     image: geerlingguy/docker-debian12-ansible
     <<: *default_platform
